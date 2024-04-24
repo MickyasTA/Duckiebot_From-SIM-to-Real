@@ -15,3 +15,4 @@ cv2.imshow('Gray Image',gray)# the first argument is the name of the window that
 
 #cv2.imshow('result',image)# the first argument is the name of the window that we open and the second is the name of the image that we want to show 
 cv2.waitKey()
+

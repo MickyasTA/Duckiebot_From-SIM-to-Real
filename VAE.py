@@ -1,3 +1,4 @@
+import os
 import torch 
 import torchvision
 import torch.nn.functional as F
@@ -34,7 +35,7 @@ test_dataloader=DataLoader(test_data, batch_size=batch_size)
 class VAE(nn.Module):
     def __init__(self):
         super(VAE,self).__init__()
-        flat=nn.Flatten()
+        self.flat=nn.Flatten()
         self.encoder_network=nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -52,15 +53,14 @@ class VAE(nn.Module):
     def forward(self, x):
         for layer in self.encoder_network:
             x = layer(x)
-            z = x  # Output of the encoder
+            lattent_img= x  # Output of the encoder
 
         for layer in self.decoder_network:
              x = layer(x)
-        return x, z
+        return x, lattent_img
 
 model=VAE().to(device)
 print(model)
-
 # setup the optimizer
 optimizer=torch.optim.Adam(model.parameters(),lr=learning_rate)
 
@@ -106,9 +106,12 @@ torch.save(model.state_dict(),'conv_autoencoder.pth')
 print("Saved PyTorch Model State to model.pth")
 
 # Load the model
-"""model=VAE()
-model.load_state_dict(torch.load("conv_autoencoder.pth"))
-"""
+model=VAE()
+if os.path.exists("conv_autoencoder.pth                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "):
+    model.load_state_dict(torch.load("conv_autoencoder.pth"))
+
+
+
 def unnormalize(img):
     img = (img * 0.5) + 0.5  # Reverse normalization
     return img
@@ -119,6 +122,8 @@ with torch.no_grad():
     x = x[:8]
     x = x.to(device)
     x_hat, _ = model(x)
+    #output, latetnt=model.forward(x).to(device)
+    #print(latetnt.shape())
   # x_hat = F.interpolate(x_hat, size=x.shape[2:]) # not needed
     x_hat = x_hat.cpu().numpy()
 
