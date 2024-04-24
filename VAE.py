@@ -114,23 +114,23 @@ def unnormalize(img):
     return img
 
 with torch.no_grad():
-  model.eval()
-  x, _ = next(iter(test_dataloader))
-  x = x[:8]
-  x = x.to(device)
-  x_hat, _ = model(x)
+    model.eval()
+    x, _ = next(iter(test_dataloader))
+    x = x[:8]
+    x = x.to(device)
+    x_hat, _ = model(x)
   # x_hat = F.interpolate(x_hat, size=x.shape[2:]) # not needed
-  x_hat = x_hat.cpu().numpy()
+    x_hat = x_hat.cpu().numpy()
 
-  x = unnormalize(x)
-  x_hat = unnormalize(x_hat)
+    x = unnormalize(x)
+    x_hat = unnormalize(x_hat)
       
   # Plot the original and reconstructed images
-  fig, axes = plt.subplots(nrows=2, ncols=len(x), figsize=(16, 4))
-  for i in range(len(x)):
-      axes[0, i].imshow(x[i].cpu().numpy().squeeze(), cmap='gray')
-      axes[0, i].axis('off')
-      axes[1, i].imshow(x_hat[i].squeeze(), cmap='gray')
-      axes[1, i].axis('off')
-  plt.tight_layout()
-  plt.show()
+    fig, axes = plt.subplots(nrows=2, ncols=len(x), figsize=(16, 4))
+    for i in range(len(x)):
+        axes[0, i].imshow(x[i].cpu().numpy().squeeze(), cmap='gray')
+        axes[0, i].axis('off')
+        axes[1, i].imshow(x_hat[i].squeeze(), cmap='gray')
+        axes[1, i].axis('off')
+    plt.tight_layout()
+    plt.show()
