@@ -10,7 +10,7 @@ from torch import nn
 
 
 # Network parameters 
-batch_size=4
+batch_size=64 # Higher bacth size
 epoch=3
 learning_rate=1e-3
 
@@ -24,10 +24,10 @@ img_transform=transforms.Compose([transforms.ToTensor(),
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Download training data from open datasets.
-training_data=datasets.MNIST(root="data",train=True,transform=img_transform,download=True)
-training_dataloader=DataLoader(training_data)
+training_data=datasets.MNIST(root="data",train=True,transform=img_transform,download=True) 
+training_dataloader=DataLoader(training_data, batch_size=batch_size, shuffle=True)  # Specify batch size and shuffle
 test_data=datasets.MNIST(root="data",train=False,transform=img_transform,download=True)
-test_dataloader=DataLoader(test_data)
+test_dataloader=DataLoader(test_data, batch_size=batch_size)
 
 # Bulding the VAE model (Variational Autoencoder)
 
@@ -47,7 +47,7 @@ class VAE(nn.Module):
             nn.ConvTranspose2d(8, 16,kernel_size=3,stride=2,padding=1,output_padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(16, 1,kernel_size=3,stride=2,padding=1,output_padding=1),
-            nn.Sigmoid()
+            nn.Tanh() # TANH instead of sigmoid
         )
     def forward(self, x):
         for layer in self.encoder_network:
@@ -57,7 +57,6 @@ class VAE(nn.Module):
         for layer in self.decoder_network:
              x = layer(x)
         return x, z
-
 
 model=VAE().to(device)
 print(model)
@@ -91,47 +90,11 @@ def traning_loop(training_dataloader,optimizer,loss_func,model):
             loss,current=loss.item(),index*len(actual_data)+len(actual_data)
             print(f"loss:{loss} current:{current}")
             
-def testing_loop(test_dataloader,loss_func,model):
-    size=len(test_dataloader.dataset)
-    model.eval()
-    num_batches =len(test_data)
-    correct,test_loss=0,0
-    with torch.no_grad():
-        for actual_data,ground_truth in test_dataloader:
-            actual_data,ground_truth=actual_data.to(device),ground_truth.to(device)
-            predction,_=model(actual_data)
-            # Resize the ground truth tensor to match the shape of the prediction tensor
-            ground_truth = ground_truth.unsqueeze(1).expand_as(predction)
-            test_loss+=loss_func(actual_data,ground_truth).item()
-            correct+=(predction.argmax(1)==ground_truth).type(torch.float).sum().item()
-        test_loss/=num_batches
-        correct/=size
-        print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-        
-        # Move tensors to CPU for visualization
-"""        actual_data = actual_data.cpu()
-        predction = predction.cpu()
-        
-         # Visualization of the reconstructed data
-        for i in range(batch_size):
-            plt.figure(figsize=(2, 2))
-            plt.imshow(actual_data[i].squeeze(), cmap='gray')
-            plt.axis('off')
-            plt.title('Original')
-            plt.show()
-            
-            plt.figure(figsize=(2, 2))
-            plt.imshow(predction[i].squeeze(), cmap='gray')
-            plt.axis('off')
-            plt.title('Reconstructed')
-            plt.show()"""
+
 for t in range(epoch): 
     print(f" Epoch {t+1}\n--------------------------------------------")
     traning_loop(training_dataloader=training_dataloader,
                  optimizer=optimizer,
-                 loss_func=loss_func,
-                 model=model)
-    testing_loop(test_dataloader=test_dataloader,
                  loss_func=loss_func,
                  model=model)
 print("  Done ! ")
@@ -146,23 +109,28 @@ print("Saved PyTorch Model State to model.pth")
 """model=VAE()
 model.load_state_dict(torch.load("conv_autoencoder.pth"))
 """
+def unnormalize(img):
+    img = (img * 0.5) + 0.5  # Reverse normalization
+    return img
 
-# Visualization of the reconstructed data
 with torch.no_grad():
-    model.eval()
-    for actual_data, _ in test_dataloader:
-        actual_data = actual_data.to(device)
-        reconstructed_data, _ = model(actual_data)
-        reconstructed_data = F.interpolate(reconstructed_data, size=actual_data.shape[2:])
-        reconstructed_data = reconstructed_data.cpu().numpy()
-        
-        # Plot the original and reconstructed images
-        fig, axes = plt.subplots(nrows=2, ncols=batch_size, figsize=(batch_size*2, 4))
-        for i in range(batch_size):
-            axes[0, i].imshow(actual_data[i].squeeze(), cmap='gray')
-            axes[0, i].axis('off')
-            axes[1, i].imshow(reconstructed_data[i].squeeze(), cmap='gray')
-            axes[1, i].axis('off')
-        plt.tight_layout()
-        plt.show()
+  model.eval()
+  x, _ = next(iter(test_dataloader))
+  x = x[:8]
+  x = x.to(device)
+  x_hat, _ = model(x)
+  # x_hat = F.interpolate(x_hat, size=x.shape[2:]) # not needed
+  x_hat = x_hat.cpu().numpy()
 
+  x = unnormalize(x)
+  x_hat = unnormalize(x_hat)
+      
+  # Plot the original and reconstructed images
+  fig, axes = plt.subplots(nrows=2, ncols=len(x), figsize=(16, 4))
+  for i in range(len(x)):
+      axes[0, i].imshow(x[i].cpu().numpy().squeeze(), cmap='gray')
+      axes[0, i].axis('off')
+      axes[1, i].imshow(x_hat[i].squeeze(), cmap='gray')
+      axes[1, i].axis('off')
+  plt.tight_layout()
+  plt.show()
