@@ -16,3 +16,16 @@ cv2.imshow('Gray Image',gray)# the first argument is the name of the window that
 #cv2.imshow('result',image)# the first argument is the name of the window that we open and the second is the name of the image that we want to show 
 cv2.waitKey()
 
+
+# Finding Lane Line (Gaussian Blur)
+# Gaussian Blur:-- is used to reduce noise in the image
+# Noise:-- is the random variation of brightness or color in the image
+# Kernel:-- is a matrix that slides over the image and does a mathematical operation on the pixels
+# Gaussian Blur:-- is a way to reduce noise in the image by averaging the pixels
+
+blur=cv2.GaussianBlur(gray,(5,5),deviation=0) # the second argument is the kernel size and the third is the deviation
+
+# Edge Detection (Canny)
+# Canny:-- is an edge detection algorithm that detects a wide range of edges in images.
+#          it is a multi-step algorithm that involves smoothing the image, finding the gradient, and applying non-maximum suppression
+
