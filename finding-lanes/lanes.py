@@ -1,18 +1,41 @@
-import cv2 # by importing this we got access to imread() and imshow() functions 
+import cv2 ## by importing this we got access to imread() and imshow() functions 
 import numpy as np
+import matplotlib.pyplot as plt
 
-
+# detecting Edges using canny 
 def CannyImg(lane_image):
     gray =cv2.cvtColor(lane_image,cv2.COLOR_BGR2GRAY)
     blur =cv2.GaussianBlur(gray,(5,5),0)
-    canny_img=cv2.Canny(blur,50,150)
+    canny_img=cv2.Canny(blur,10,150)
     return canny_img
 
+# Creating a mask
+def Region_of_interest(image):
+    hight=image.shape[0]
+    polygone=np.array([[(200,hight),(1100,hight),(550,250)]])
+    mask=np.zeros_like(image)
+    cv2.fillPoly(mask,polygone,255)# this will fill the mask with the color white
+    # Finding Lane Lines Bitwise_and
+    masked_image = cv2.bitwise_and(image,mask) # this will show the lane lines only
+    return masked_image 
+
+
+
+    
 image=cv2.imread("test_image.jpg")
 lane_image=np.copy(image)
 Modified_Canny_Image=CannyImg(lane_image)
+
+cv2.imshow("mage",Region_of_interest(image))
 cv2.imshow("Modified_Canny_Image",Modified_Canny_Image)
 cv2.waitKey(0)
+ 
+# we can also use matplotlib to show the images
+#plt.imshow(Modified_Canny_Image)
+#plt.show()
+ 
+
+ 
 
 
 
@@ -25,10 +48,7 @@ cv2.waitKey(0)
 
 
 
-
-
-
-
+#_____________________theory______________________
 
 """# Edge detection algorithm using Canny
 # Finding Lane lines (Gryascale convertion)
