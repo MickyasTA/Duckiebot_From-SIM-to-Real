@@ -46,14 +46,14 @@ class Agent():
         state_value_=torch.squeeze(state_value_)
         
         action_probs=torch.distributions.categorical(probabilites)
-        log_prob=action_probs.Log_prob(self.action)
+        log_prob=action_probs.log_prob(self.action) # we calculate the log probability of the action we took    
         
-        delta = reward + self.gamma*state_value_*(1-int(done)) - state_value
-        actor_loss = -log_prob*delta
-        critic_loss=delta**2
-        total_loss= actor_loss+critic_loss
+        delta = reward + self.gamma*state_value_*(1-int(done)) - state_value    # we calculate the TD error 
+        actor_loss = -log_prob*delta    # we calculate the actor loss   
+        critic_loss=delta**2       # we calculate the critic loss
+        total_loss= actor_loss+critic_loss  
         
-        gradient=total_loss.backward()
-        self.actor_critic.optimizer.step()
+        gradient=total_loss.backward()  # we backpropagate the gradients
+        self.actor_critic.optimizer.step()  # we update the weights of the network
         
         
