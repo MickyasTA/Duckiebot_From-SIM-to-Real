@@ -39,5 +39,21 @@ class Agent():
         
         # calculate the gradients 
         self.actor_critic.optimizer.zero_grad()
-        value,probabilites=self.actor_critic(state)
-        value_,_=self.actor_critic(state_)
+        state_value,probabilites=self.actor_critic(state)
+        state_value_,_=self.actor_critic(state_) 
+        
+        state_value=torch.squeeze(state_value) # we squeeze the value to remove the extra dimension  [1,1] -> [1]
+        state_value_=torch.squeeze(state_value_)
+        
+        action_probs=torch.distributions.categorical(probabilites)
+        log_prob=action_probs.Log_prob(self.action)
+        
+        delta = reward + self.gamma*state_value_*(1-int(done)) - state_value
+        actor_loss = -log_prob*delta
+        critic_loss=delta**2
+        total_loss= actor_loss+critic_loss
+        
+        gradient=total_loss.backward()
+        self.actor_critic.optimizer.step()
+        
+        
