@@ -54,7 +54,7 @@ class Agent():
         critic_loss=delta**2       # we calculate the critic loss
         total_loss= actor_loss+critic_loss  
         
-        gradient=total_loss.backward()  # we backpropagate the gradients
+        total_loss.backward()  # we backpropagate the gradients
         self.actor_critic.optimizer.step()  # we update the weights of the network
         
         
