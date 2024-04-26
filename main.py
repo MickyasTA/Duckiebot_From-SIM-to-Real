@@ -39,6 +39,7 @@ if __name__=='__main__':
             best_score=avg_score
         if not check_path_dir and os.path.exists(check_path_dir):
             agent.save_model()
+        print("episode",i,"score %.1f" %score,"avg_score %.1f" %avg_score)
     x=[i+1 for i in range(n_games)]
     plot_learning_curve(x,score_history,figure_file)    
         
