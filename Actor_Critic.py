@@ -5,6 +5,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 
+learning_rate=0.0003
+
 class ActorCriticNetwork(nn.Module):
 # since every thing is given except for the num_action we pass only num_action 
     def __init__(self,num_action,fc1_dims=1024,fc2_dims=512,
@@ -18,17 +20,19 @@ class ActorCriticNetwork(nn.Module):
         self.checkpoint_file=os.path.join(self.checkpoint_dir,name+"_ac")
         
         # The network
-        self.fc1=nn.Linear(in_features=self.num_action,out_features=self.fc1_dims)
+        self.fc1=nn.Linear(in_features=4,out_features=self.fc1_dims)
         self.fc2=nn.Linear(in_features=self.fc1_dims,out_features=self.fc2_dims)
         self.value=nn.Linear(in_features=self.fc2_dims,out_features=1) # there is no activation 
         self.policy_pi=nn.Linear(self.fc2_dims,num_action)
         self.policy_act=nn.Softmax()
         
+         # define the optimizer
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=learning_rate)
     def forward(self,state):
         x=self.fc1(state)
-        x=nn.ReLU(x)
+        x=F.relu(x)
         x=self.fc2(x)
-        x=nn.ReLU(x)
+        x=F.relu(x)
         
         value=self.value(x)
         policy_pi=self.policy_act(self.policy_pi(x))
