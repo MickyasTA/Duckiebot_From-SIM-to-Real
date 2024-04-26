@@ -34,7 +34,8 @@ class ActorCriticNetwork(nn.Module):
         policy_pi=self.policy_act(self.policy_pi(x))
         
         return value ,policy_pi
-    
-        
-        
+"""    check point of this code and it is working well 
+model=ActorCriticNetwork(12)
+print(model)
+        """
     
