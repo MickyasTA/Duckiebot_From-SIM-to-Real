@@ -8,7 +8,7 @@ from utils import plot_learning_curve
 if __name__=='__main__':
     env=gym.make('CartPole-v1')
     agent=Agent(learning_rate=1e-5,gamma=0.99,n_actions=env.action_space.n)
-    n_games=1800
+    n_games=1400
     filename='cartpole.png'
     figure_file='plots/'+ filename
     
@@ -16,6 +16,11 @@ if __name__=='__main__':
     score_history=[]
     #load_checkpoint=False
     check_path_dir="tmp/actor_critic"
+    
+    dir_name = 'D:\\MARS\\IRT_EXUPERY\\Actual Internship\\CODE\\Duckiebot_From-SIM-to-Real\\plots\\'
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+    
     if check_path_dir and os.path.exists(check_path_dir):
         
         agent.load_model()
