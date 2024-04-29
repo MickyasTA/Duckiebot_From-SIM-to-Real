@@ -83,3 +83,48 @@ print("********Average reward per thousand episodes********\n")
 for r in rewards_per_thousand_episodes:
     print(count, ": ", str(sum(r/1000)))
     count += 1000
+
+# Print updated Q-table
+print("\n\n********Q-table********\n")
+print(q_table)
+
+
+########### Watch Q-Learning Agent Play Frozen Lake ##############
+
+
+# Watch our agent play Frozen Lake by playing the best action 
+# from each state according to the Q-table
+
+for episode in range(3):
+    # initialize new episode params
+    state=env.reset()[0]
+    done=False
+    print("******* EPISODE ",episode+1 ,"*******\n\n\n")
+    time.sleep(1) # sleep for one second
+
+    for step in range(max_steps_per_episode):        
+        # Show current state of environment on screen
+        clear_output(wait=True)
+        print(env.render())
+        time.sleep(0.3)
+        # Choose action with highest Q-value for current state    
+        action=np.argmax(q_table[state,:])   
+        # Take new action
+        new_state,reward,done,trancated,info=env.step(action)
+
+        if done:
+            clear_output(wait=True)
+            print(env.render())
+            if reward == 1:
+                # Agent reached the goal and won episode
+                print("*********You reached the goal! ********")
+                time.sleep(3)
+            else:
+                # Agent stepped in a hole and lost episode            
+                print("****You fell through a hole!****")
+                time.sleep(3)
+                clear_output(wait=True)
+            break
+        # Set new state
+        state=new_state
+env.close()
