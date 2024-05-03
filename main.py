@@ -4,7 +4,7 @@ import numpy as np
 from Agent_Actor_Critic import Agent
 import matplotlib.pyplot as plt
 from utils import plot_learning_curve
-
+from tqdm import tqdm
 if __name__=='__main__':
     env=gym.make('CartPole-v1')
     agent=Agent(learning_rate=1e-5,gamma=0.99,n_actions=env.action_space.n)
@@ -26,7 +26,7 @@ if __name__=='__main__':
         agent.load_model()
         """ if load_checkpoint:
             agent.load_model()"""
-    for i in range(n_games):
+    for i in tqdm(range(n_games)):
         observation=env.reset() # Resets the environment to an initial state and returns the initial observation.
         observation=observation[0] # extracting observation_array
         #print("Initial observation shape:", observation)

@@ -31,7 +31,7 @@ training_dataloader=DataLoader(training_data, batch_size=batch_size, shuffle=Tru
 test_data=datasets.MNIST(root="data",train=False,transform=img_transform,download=True)
 test_dataloader=DataLoader(test_data, batch_size=batch_size)
 
-# Bulding the VAE model (Variational Autoencoder)
+# Bulding the AE model ( Autoencoder)
 # Check if the trained model file exists
 
 model_path = 'conv_autoencoder.pth'  # Adjust the path to your trained model file
@@ -55,12 +55,14 @@ class VAE(nn.Module):
             nn.Tanh() # TANH instead of sigmoid
         )
     def forward(self, x):
-        for layer in self.encoder_network:
+        """        for layer in self.encoder_network:
             x = layer(x)
-            lattent_img= x  # Output of the encoder
-
-        for layer in self.decoder_network:
-             x = layer(x)
+            lattent_img= x  # Output of the encoder"""
+        x = self.encoder_network(x)
+        lattent_img= x
+        """for layer in self.decoder_network:
+             x = layer(x)"""
+        x=self.decoder_network(x)
         return x, lattent_img
 
 model=VAE().to(device)

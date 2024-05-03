@@ -4,6 +4,8 @@ import time
 import random
 import os 
 from IPython.display import clear_output
+from tqdm import tqdm
+
 
 # Initalization 
 num_episodes = 10000
@@ -32,7 +34,7 @@ print(q_table)
 # Coding the Q-Learning Algorithm training loop
 
 
-for episode in range(num_episodes):
+for episode in tqdm(range(num_episodes)):
     # first we have to reset the environment
     state=env.reset()[0]
     done=False
@@ -95,7 +97,7 @@ print(q_table)
 # Watch our agent play Frozen Lake by playing the best action 
 # from each state according to the Q-table
 
-for episode in range(3):
+for episode in range(1):
     # initialize new episode params
     state=env.reset()[0]
     done=False
