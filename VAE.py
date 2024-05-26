@@ -13,7 +13,7 @@ from torch.utils.tensorboard import SummaryWriter   # Tensorboard support
 
 # Network parameters 
 batch_size=64 # Higher bacth size
-epoch=1000
+epoch=10
 learning_rate=1e-3
 
 
